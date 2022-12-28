@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import nlp from 'compromise';
-import { Button, FormControl, FormHelperText, Input, List, ListItem, TextField, Grid, Typography, Chip } from '@mui/material';
+import { Button, FormControl, FormHelperText, Input, List, ListItem, TextField, Grid, Typography, Chip, Card, CardItem, CardContent} from '@mui/material';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
 function App() {
   const [input, setInput] = useState('');
   const [combinations, setCombinations] = useState([]);
+  const [color, setColor] = useState('');
+  const [inputValid, setInputValid] = useState(false);
+  const [inputNumber, setInputNumber] = useState(10);
 
   function handleChange(event) {
     setInput(event.target.value);
@@ -18,27 +22,15 @@ function App() {
     event.preventDefault();
     makeLowercase();
     setCombinations(getCombinations(input));
+    setInputValid(true);
     
   }
 
-  //Function to remove a specific word from the list of combinations.
-  function removeElement(array, element) {
-    console.log(element);
-    const index = array.indexOf(element);
-    console.log(index);
-    if (index > -1) {
-      array.splice(index, 1);
-      console.log(array);
-    }
-    setCombinations(array);
-    console.log(combinations);
+  
 
-    //Refresh the page to update the list of combinations
-    window.location.reload();
-    
-
+  const handleInputNumberChange = (event) => {
+    setInputNumber(event.target.value);
   }
-
 
   function getCombinations(str) {
     const combinations = [];
@@ -70,6 +62,23 @@ function App() {
     return permutations;
   }
 
+  //Function to alert the value of the selected chip
+  const handleClick = (event) => {
+    console.log(event.target.value);
+  }
+
+
+  const resetInput = () => {
+    setInput('');
+    setInputValid(false);
+  }
+
+  const regenerateChips = () => {
+    setCombinations(getCombinations(input));
+  }
+
+  //Function to reset the 
+
   return (
     //Create a centered input form with a output grid
     <>
@@ -90,30 +99,80 @@ function App() {
           <Button type="submit" variant="contained">Submit</Button>
         </FormControl>
       </form>
+      <br></br>
+      <Button variant="contained" onClick={resetInput}><RestartAltIcon />Reset</Button>
+      <br></br>
       <Grid container justifyContent="center" alignItems="center" direction="column">
         <br></br>
         <Typography color="textPrimary" variant="h4" component="h4" gutterBottom>
           Combinations
         </Typography>
-        <Grid container justifyContent="center" alignItems="center" direction="row">
+        <Grid container justifyContent="center" alignItems="center" direction="column">
         
-          <List>
-            {combinations.map((combination) => (
+          {inputValid &&
+          <Grid container justifyContent="center" alignItems="center" direction="column">
+            
+              
+              <FormControl>
+                <TextField
+                  id="inputNumber"
+                  label="Number of Cards"
+                  value={inputNumber}
+                  onChange={handleInputNumberChange}
+                  helperText="Enter the number of chips to display"
+                />               
+              </FormControl>
+              <br></br>
 
-              <ListItem>
-                <Chip
-                  label={combination}
-                  onDelete={() => removeElement(combinations, combination)}
+              
+              <Typography color="textPrimary" variant="h5" component="h5" gutterBottom>
+                Possible Combinations: {combinations.length} 
+              </Typography>
 
-                />
+              <br></br>
 
-              </ListItem>
-            ))}
-          </List>
+              <Button variant="contained" onClick={regenerateChips}><RestartAltIcon />Regenerate</Button>
+
+              <br></br>
+              
+              <Grid container justifyContent="center" alignItems="center" direction="column">
+                {combinations.slice(0, inputNumber).map((combination) => (
+                  <>                 
+                  <div>
+                    <Card 
+                      sx={{ minWidth: 275, maxWidth: 275, bgcolor: color, m: 1, p: 1, borderRadius: 1, border: 1, borderColor: 'text.primary' }}
+                      variant="outlined"
+                      
+                    >
+                      <CardContent>
+                        <Typography color="textPrimary" variant="h5" component="h2" gutterBottom align="center">
+                          <div>
+                          {combinations[Math.floor(Math.random() * combinations.length)]} 
+                          </div>
+
+                        </Typography>
+                      </CardContent>
+                    </Card>
+
+                  </div>
+                  <br></br>
+                  </>
+                ))}
+              </Grid>
+
+              <br></br>
+              <br></br>
+              
+              
+            
+            </Grid>
+      }
+            
+
+            
+          
 
 
-
-      
         </Grid>
       </Grid>
     </Grid>
